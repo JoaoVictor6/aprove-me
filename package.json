@@ -1,0 +1,16 @@
+{
+  "name": "aprove-me",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:backend": "pnpm --filter=backend run dev",
+    "dev:frontend": "pnpm --filter=frontend run dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vitest": "^1.6.0"
+  }
+}
