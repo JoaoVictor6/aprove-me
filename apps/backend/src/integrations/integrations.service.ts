@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
-const API_PASSWORD = 'aproveme';
-const API_LOGIN = 'aproveme';
+import { API_LOGIN, API_PASSWORD } from './constants';
 
 @Injectable()
 export class IntegrationsService {
