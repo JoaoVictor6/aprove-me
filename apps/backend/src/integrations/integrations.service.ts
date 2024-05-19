@@ -14,7 +14,7 @@ export class IntegrationsService {
     }
     return {
       error: null,
-      token: this.jwtService.sign('aproveme'),
+      token: this.jwtService.sign({ id: 'aproveme' }),
     };
   }
 }
