@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { authAssignor } from '../api/assignor';
 
 
 const loginSchema = z.object({
@@ -34,7 +35,7 @@ export default function Page() {
   })
   
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    authAssignor(values)
+    await authAssignor(values)
   }
 
   return (

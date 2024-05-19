@@ -32,7 +32,7 @@ const fetchFn = async <ResponseType>(
   };
 };
 
-const apiClient = {
+export const apiClient = {
   post: async <ResponseType>(
     url: string,
     body: unknown,
