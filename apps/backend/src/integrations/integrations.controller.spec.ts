@@ -1,4 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Response } from 'express';
 import { IntegrationsController } from './integrations.controller';
@@ -26,6 +27,7 @@ const getResponseStub = () => {
 
 describe('IntegrationsController', () => {
   let controller: IntegrationsController;
+  let service: IntegrationsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -33,12 +35,19 @@ describe('IntegrationsController', () => {
       providers: [
         {
           provide: IntegrationsService,
-          useValue: jest.fn(),
+          useValue: { createCredentials: () => {} },
         },
+      ],
+      imports: [
+        JwtModule.register({
+          secret: process.env.JWT_SECRET,
+          signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
+        }),
       ],
     }).compile();
 
     controller = module.get<IntegrationsController>(IntegrationsController);
+    service = module.get<IntegrationsService>(IntegrationsService);
   });
 
   it('should be defined', () => {
@@ -47,6 +56,9 @@ describe('IntegrationsController', () => {
 
   it.only('should return unauthorized status if credentials is not valid', () => {
     const { responseStub, responseStatusMethodStub } = getResponseStub();
+    jest
+      .spyOn(service, 'createCredentials')
+      .mockReturnValue({ error: 'any', token: '' });
 
     controller.auth(
       {
