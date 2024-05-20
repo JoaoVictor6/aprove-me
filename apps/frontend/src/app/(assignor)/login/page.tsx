@@ -2,10 +2,12 @@
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/use-toast';
+import { useAuthStore } from '@/stores/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { authAssignor } from '../api/assignor';
+import { authAssignor } from '../api/authAssignor';
 
 
 const loginSchema = z.object({
@@ -33,9 +35,23 @@ export default function Page() {
       password: ''
     }
   })
-  
+  const toast = useToast()
+  const setAuthToken = useAuthStore(state => state.setToken)
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    await authAssignor(values)
+    const { data, error: errorMessage } = await authAssignor(values)
+  
+    if(errorMessage) {
+      toast.toast({ 
+        title: 'Ocorreu um erro!', 
+        description: errorMessage,
+        variant: 'destructive'
+      })
+      return
+    }
+    if(data) {
+      console.log(data)
+      setAuthToken(data.token)
+    }
   }
 
   return (
