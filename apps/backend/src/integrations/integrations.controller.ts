@@ -7,11 +7,11 @@ import {
   Post,
   Res,
 } from '@nestjs/common';
+import { payable } from 'database';
 import { Response } from 'express';
 import { z } from 'zod';
 import { AuthDTO } from './DTO/auth.dto';
 import { IntegrationsService } from './integrations.service';
-
 const verifyId = (id: string) => {
   const { success: isUUID } = z.string().uuid().safeParse(id);
 
@@ -34,7 +34,10 @@ export class IntegrationsController {
   }
 
   @Get('payable/:id')
-  async find(@Param() id: string, @Res() res: Response) {
+  async findUniquePayable(
+    @Param() id: string,
+    @Res() res: Response,
+  ): Promise<payable | Response> {
     const { isUUID } = verifyId(id);
     if (!isUUID) {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid id' });
