@@ -5,9 +5,9 @@ type AuthStore = { token: string, setToken: (token: string) => void }
 
 export const useAuthStore = create(
   persist<AuthStore>(
-    (_get, set) => ({
+    (set) => ({
       setToken(token) {
-        set().token = token;
+        set({ token })
       },
       token: ''
     }),
