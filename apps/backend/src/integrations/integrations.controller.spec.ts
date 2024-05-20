@@ -50,47 +50,49 @@ describe('IntegrationsController', () => {
     service = module.get<IntegrationsService>(IntegrationsService);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+  describe('/integrations/auth', () => {
+    it('should be defined', () => {
+      expect(controller).toBeDefined();
+    });
 
-  it('should return unauthorized status if credentials is not valid', () => {
-    const { responseStub, responseStatusMethodStub } = getResponseStub();
-    jest
-      .spyOn(service, 'createCredentials')
-      .mockReturnValue({ error: 'any', token: null });
+    it('should return unauthorized status if credentials is not valid', () => {
+      const { responseStub, responseStatusMethodStub } = getResponseStub();
+      jest
+        .spyOn(service, 'createCredentials')
+        .mockReturnValue({ error: 'any', token: null });
 
-    controller.auth(
-      {
-        login: 'invalid_login',
-        password: 'invalid_password',
-      },
-      responseStub,
-    );
+      controller.auth(
+        {
+          login: 'invalid_login',
+          password: 'invalid_password',
+        },
+        responseStub,
+      );
 
-    expect(responseStatusMethodStub).toHaveBeenCalledWith(
-      HttpStatus.UNAUTHORIZED,
-    );
-  });
-  it('if credentials is valid, return a token with OK status', () => {
-    const { responseStub, responseJsonMethodStub, responseStatusMethodStub } =
-      getResponseStub();
-    const expectedJsonObject = {
-      token: 'any',
-    };
-    jest
-      .spyOn(service, 'createCredentials')
-      .mockReturnValue({ error: null, token: 'any' });
+      expect(responseStatusMethodStub).toHaveBeenCalledWith(
+        HttpStatus.UNAUTHORIZED,
+      );
+    });
+    it('if credentials is valid, return a token with OK status', () => {
+      const { responseStub, responseJsonMethodStub, responseStatusMethodStub } =
+        getResponseStub();
+      const expectedJsonObject = {
+        token: 'any',
+      };
+      jest
+        .spyOn(service, 'createCredentials')
+        .mockReturnValue({ error: null, token: 'any' });
 
-    controller.auth(
-      {
-        login: 'invalid_login',
-        password: 'invalid_password',
-      },
-      responseStub,
-    );
+      controller.auth(
+        {
+          login: 'invalid_login',
+          password: 'invalid_password',
+        },
+        responseStub,
+      );
 
-    expect(responseJsonMethodStub).toHaveBeenCalledWith(expectedJsonObject);
-    expect(responseStatusMethodStub).toHaveBeenCalledWith(HttpStatus.OK);
+      expect(responseJsonMethodStub).toHaveBeenCalledWith(expectedJsonObject);
+      expect(responseStatusMethodStub).toHaveBeenCalledWith(HttpStatus.OK);
+    });
   });
 });
