@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuthStore } from '@/stores/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { authAssignor } from '../api/authAssignor';
@@ -37,6 +38,8 @@ export default function Page() {
   })
   const toast = useToast()
   const setAuthToken = useAuthStore(state => state.setToken)
+  const router = useRouter()
+
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     const { data, error: errorMessage } = await authAssignor(values)
   
@@ -49,8 +52,11 @@ export default function Page() {
       return
     }
     if(data) {
-      console.log(data)
       setAuthToken(data.token)
+      toast.toast({ 
+        title: 'Login feito com sucesso!', 
+      })
+      router.push("/")
     }
   }
 
