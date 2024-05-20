@@ -44,7 +44,8 @@ export class IntegrationsController {
     }
     const { data, error } = await this.integrationsService.findPayable(id);
     if (error) {
-      // todo!
+      // unhandled error
+      return res.status(500);
     }
 
     if (data) return data;
