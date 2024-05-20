@@ -151,5 +151,20 @@ describe('IntegrationsController', () => {
 
       expect(returnedValue).toStrictEqual(expectedJsonObject);
     });
+
+    it('return internal error code for unhandled errors', async () => {
+      const payableIdMock = faker.string.uuid();
+      const { responseStub, responseStatusMethodStub } = getResponseStub();
+      jest.spyOn(service, 'findPayable').mockImplementation(async () => ({
+        data: null,
+        error: new Error('Unhandled'),
+      }));
+
+      await controller.findUniquePayable(payableIdMock, responseStub);
+
+      expect(responseStatusMethodStub).toHaveBeenCalledWith(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    });
   });
 });
