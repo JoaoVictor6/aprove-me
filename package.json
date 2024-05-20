@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "dev:backend": "pnpm --filter=backend run start:dev",
-    "dev:frontend": "pnpm --filter=frontend run dev"
+    "dev:frontend": "pnpm --filter=frontend run dev",
+    "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "vitest": "^1.6.0"
   }
 }
