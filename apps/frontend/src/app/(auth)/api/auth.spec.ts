@@ -1,13 +1,13 @@
 import { apiClient } from "@/lib/apiClient"
 import { StatusCodes } from "http-status-codes"
-import { UNAUTHORIZED_ERROR_MESSAGE, authAssignor } from "./authAssignor"
+import { UNAUTHORIZED_ERROR_MESSAGE, auth } from "./auth"
 
-describe('authAssignor', () => {
+describe('auth', () => {
   it('return a specific error message if api client return unauthorized code', async () => {
     vi.spyOn(apiClient, 'post')
       .mockImplementation(async () => ({ data: null, error: { status: StatusCodes.UNAUTHORIZED, message: '' } }))
 
-    const { error } = await authAssignor({
+    const { error } = await auth({
       login: 'WRONG',
       password: 'WRONG'
     })
@@ -19,7 +19,7 @@ describe('authAssignor', () => {
     vi.spyOn(apiClient, 'post')
       .mockImplementation(async () => ({ data: expectedReturnDataObject, error: null }))
 
-    const { data } = await authAssignor({
+    const { data } = await auth({
       login: 'CORRECT',
       password: 'CORRECT'
     })
@@ -31,7 +31,7 @@ describe('authAssignor', () => {
     vi.spyOn(apiClient, 'post')
       .mockImplementation(async () => ({ data: null, error: { message: expectedErrorMessage, status: 999 } }))
 
-    const { error } = await authAssignor({
+    const { error } = await auth({
       login: 'CORRECT',
       password: 'CORRECT'
     })

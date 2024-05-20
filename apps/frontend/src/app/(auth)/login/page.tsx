@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { authAssignor } from '../api/authAssignor';
+import { auth } from '../api/auth';
 
 
 const loginSchema = z.object({
@@ -41,7 +41,7 @@ export default function Page() {
   const router = useRouter()
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    const { data, error: errorMessage } = await authAssignor(values)
+    const { data, error: errorMessage } = await auth(values)
   
     if(errorMessage) {
       toast.toast({ 

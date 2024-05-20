@@ -9,7 +9,7 @@ const assignorUrls = {
 
 export const UNAUTHORIZED_ERROR_MESSAGE = 'Usuário e/ou senha inválidos'
 
-export const authAssignor = async ({ login, password }: { login: string, password: string }): Promise<{
+export const auth = async ({ login, password }: { login: string, password: string }): Promise<{
   error: string,
   data: null
 } | {
