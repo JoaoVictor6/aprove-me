@@ -1,8 +1,10 @@
 import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Prisma } from 'database';
 import { IntegrationsService } from './integrations.service';
+import { PRISMA_NOT_FOUND_ERROR_CODE } from './prisma.constants';
 import { PrismaService } from './prisma.service';
-import { payableFactory } from './utils/test/payableFactory';
+
 describe('IntegrationsService', () => {
   let service: IntegrationsService;
   let prismaService: PrismaService;
@@ -50,7 +52,13 @@ describe('IntegrationsService', () => {
       jest
         .spyOn(prismaService.payable, 'findUniqueOrThrow')
         //@ts-expect-error Prisma type error, not problem
-        .mockImplementation(async () => payableFactory());
+        .mockImplementation(async () => {
+          throw new Prisma.PrismaClientKnownRequestError('NOt found', {
+            code: PRISMA_NOT_FOUND_ERROR_CODE,
+            clientVersion: '',
+            batchRequestIdx: 1,
+          });
+        });
 
       const { error, data } = await service.findPayable('anything');
 

@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { payable } from 'database';
+import { Prisma, payable } from 'database';
 import { API_LOGIN, API_PASSWORD } from './constants';
+import { PRISMA_NOT_FOUND_ERROR_CODE } from './prisma.constants';
 import { PrismaService } from './prisma.service';
+
 interface IIntegrationsService {
   createCredentials: (props: {
     password: string;
@@ -45,6 +47,10 @@ export class IntegrationsService implements IIntegrationsService {
 
       return { data, error: null };
     } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PRISMA_NOT_FOUND_ERROR_CODE)
+          return { data: null, error: null };
+      }
       return {
         data: null,
         error: error,
