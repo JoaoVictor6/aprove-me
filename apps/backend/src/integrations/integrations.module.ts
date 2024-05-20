@@ -3,10 +3,11 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { IntegrationsController } from './integrations.controller';
 import { IntegrationsService } from './integrations.service';
+import { PrismaService } from './prisma.service';
 
 ConfigModule.forRoot();
 @Module({
-  providers: [IntegrationsService],
+  providers: [IntegrationsService, PrismaService],
   controllers: [IntegrationsController],
   imports: [
     JwtModule.register({
