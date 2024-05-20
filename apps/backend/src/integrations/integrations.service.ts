@@ -39,13 +39,11 @@ export class IntegrationsService implements IIntegrationsService {
     id: string,
   ): ReturnType<IIntegrationsService['findPayable']> {
     try {
-      const data = await this.prismaService.payable.findUnique({
+      const data = await this.prismaService.payable.findUniqueOrThrow({
         where: { id },
       });
 
-      if (data) {
-        return { data, error: null };
-      }
+      return { data, error: null };
     } catch (error) {
       return {
         data: null,
