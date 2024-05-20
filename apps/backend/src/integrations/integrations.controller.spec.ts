@@ -2,10 +2,10 @@ import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { payable } from 'database';
 import { Response } from 'express';
 import { IntegrationsController } from './integrations.controller';
 import { IntegrationsService } from './integrations.service';
+import { payableFactory } from './utils/test/payableFactory';
 const getResponseStub = () => {
   const responseStatusMethodStub = jest.fn();
   const responseJsonMethodStub = jest.fn();
@@ -132,24 +132,19 @@ describe('IntegrationsController', () => {
 
     it('send a json with data and OK status code if is receive a valid id', async () => {
       const { responseStub } = getResponseStub();
-      const payableIdMock = faker.string.uuid();
-      const expectedJsonObject: payable = {
-        assignor: faker.string.uuid(),
-        emissionDate: faker.date.anytime(),
-        id: payableIdMock,
-        value: Number(faker.finance.amount()),
-      };
+      const payableMock = payableFactory();
+
       jest.spyOn(service, 'findPayable').mockImplementation(async () => ({
-        data: expectedJsonObject,
+        data: payableMock,
         error: null,
       }));
 
       const returnedValue = await controller.findUniquePayable(
-        payableIdMock,
+        payableMock.id,
         responseStub,
       );
 
-      expect(returnedValue).toStrictEqual(expectedJsonObject);
+      expect(returnedValue).toStrictEqual(payableMock);
     });
 
     it('return internal error code for unhandled errors', async () => {
