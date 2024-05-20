@@ -1,3 +1,4 @@
+import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -24,7 +25,6 @@ const getResponseStub = () => {
     responseStatusMethodStub,
   };
 };
-
 describe('IntegrationsController', () => {
   let controller: IntegrationsController;
   let service: IntegrationsService;
@@ -35,7 +35,7 @@ describe('IntegrationsController', () => {
       providers: [
         {
           provide: IntegrationsService,
-          useValue: { createCredentials: () => {} },
+          useValue: { createCredentials: () => {}, findPayable: () => {} },
         },
       ],
       imports: [
@@ -59,7 +59,7 @@ describe('IntegrationsController', () => {
       const { responseStub, responseStatusMethodStub } = getResponseStub();
       jest
         .spyOn(service, 'createCredentials')
-        .mockReturnValue({ error: 'any', token: null });
+        .mockReturnValue({ error: new Error('any'), token: null });
 
       controller.auth(
         {
@@ -93,6 +93,41 @@ describe('IntegrationsController', () => {
 
       expect(responseJsonMethodStub).toHaveBeenCalledWith(expectedJsonObject);
       expect(responseStatusMethodStub).toHaveBeenCalledWith(HttpStatus.OK);
+    });
+  });
+
+  describe.only('/payable/:id', () => {
+    it('Return bad request status if id value is not valid', async () => {
+      const { responseStub, responseStatusMethodStub } = getResponseStub();
+
+      await controller.find('INVALID_ID', responseStub);
+
+      expect(responseStatusMethodStub).toHaveBeenCalledWith(
+        HttpStatus.BAD_REQUEST,
+      );
+    });
+
+    it('send a json with message prop when occurs any error', async () => {
+      const { responseStub, responseJsonMethodStub } = getResponseStub();
+
+      await controller.find('INVALID_ID', responseStub);
+
+      expect(responseJsonMethodStub).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.anything() }),
+      );
+    });
+
+    it('Return not found status code if payable is not found', async () => {
+      const { responseStub, responseStatusMethodStub } = getResponseStub();
+      jest
+        .spyOn(service, 'findPayable')
+        .mockImplementation(async () => ({ data: null, error: null }));
+
+      await controller.find(faker.string.uuid(), responseStub);
+
+      expect(responseStatusMethodStub).toHaveBeenCalledWith(
+        HttpStatus.NOT_FOUND,
+      );
     });
   });
 });
