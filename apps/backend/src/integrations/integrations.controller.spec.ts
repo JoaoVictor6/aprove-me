@@ -101,7 +101,7 @@ describe('IntegrationsController /integrations', () => {
     });
   });
 
-  describe('POST: /payable/:id', () => {
+  describe('GET: /payable/:id', () => {
     it('Return bad request status if id value is not valid', async () => {
       const { responseStub, responseStatusMethodStub } = getResponseStub();
 
