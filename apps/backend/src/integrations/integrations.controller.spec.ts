@@ -25,7 +25,7 @@ const getResponseStub = () => {
     responseStatusMethodStub,
   };
 };
-describe('IntegrationsController', () => {
+describe('IntegrationsController /integrations', () => {
   let controller: IntegrationsController;
   let service: IntegrationsService;
 
@@ -39,6 +39,7 @@ describe('IntegrationsController', () => {
             createCredentials: () => {},
             findPayable: () => {},
             deletePayable: () => {},
+            updatePayable: () => {},
           },
         },
       ],
@@ -232,6 +233,78 @@ describe('IntegrationsController', () => {
       }));
 
       await controller.deleteUniquePayable(payableIdMock, responseStub);
+
+      expect(responseStatusMethodStub).toHaveBeenCalledWith(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    });
+  });
+
+  describe.only('PUT: /payable/:id', () => {
+    it('return bad request status if id value is not valid', async () => {
+      const { responseStub, responseStatusMethodStub } = getResponseStub();
+      const payableMock = payableFactory();
+
+      await controller.updateUniquePayable(
+        'INVALID_ID',
+        payableMock,
+        responseStub,
+      );
+
+      expect(responseStatusMethodStub).toHaveBeenCalledWith(
+        HttpStatus.BAD_REQUEST,
+      );
+    });
+
+    it('send not found status code if payable is not found', async () => {
+      const { responseStub, responseStatusMethodStub } = getResponseStub();
+      const payableMock = payableFactory();
+      jest
+        .spyOn(service, 'updatePayable')
+        .mockImplementation(async () => ({ data: null, error: null }));
+
+      await controller.updateUniquePayable(
+        payableMock.id,
+        payableMock,
+        responseStub,
+      );
+
+      expect(responseStatusMethodStub).toHaveBeenCalledWith(
+        HttpStatus.NOT_FOUND,
+      );
+    });
+
+    it('send a json with data and OK status code if is receive a valid id', async () => {
+      const { responseStub } = getResponseStub();
+      const payableMock = payableFactory();
+
+      jest.spyOn(service, 'updatePayable').mockImplementation(async () => ({
+        data: payableMock,
+        error: null,
+      }));
+
+      const returnedValue = await controller.updateUniquePayable(
+        payableMock.id,
+        payableMock,
+        responseStub,
+      );
+
+      expect(returnedValue).toStrictEqual(payableMock);
+    });
+
+    it('return internal error code for unhandled errors', async () => {
+      const payableMock = payableFactory();
+      const { responseStub, responseStatusMethodStub } = getResponseStub();
+      jest.spyOn(service, 'updatePayable').mockImplementation(async () => ({
+        data: null,
+        error: new Error('Unhandled'),
+      }));
+
+      await controller.updateUniquePayable(
+        payableMock.id,
+        payableMock,
+        responseStub,
+      );
 
       expect(responseStatusMethodStub).toHaveBeenCalledWith(
         HttpStatus.INTERNAL_SERVER_ERROR,

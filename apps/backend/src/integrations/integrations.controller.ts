@@ -6,12 +6,14 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
   Res,
 } from '@nestjs/common';
 import { payable } from 'database';
 import { Response } from 'express';
 import { z } from 'zod';
 import { AuthDTO } from './DTO/auth.dto';
+import { EditPayableDTO } from './DTO/editPayable.DTO';
 import { IntegrationsService } from './integrations.service';
 const verifyId = (id: string) => {
   const { success: isUUID } = z.string().uuid().safeParse(id);
@@ -71,6 +73,29 @@ export class IntegrationsController {
 
     if (data) return data;
 
+    return res.status(HttpStatus.NOT_FOUND).json({ message: error });
+  }
+
+  @Put('payable/:id')
+  async updateUniquePayable(
+    @Param() id: string,
+    @Body() editPayableDTO: EditPayableDTO,
+    @Res() res: Response,
+  ) {
+    const { isUUID } = verifyId(id);
+    if (!isUUID) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid id' });
+    }
+
+    const { data, error } = await this.integrationsService.updatePayable(
+      id,
+      editPayableDTO,
+    );
+    if (error) {
+      // unhandled error
+      return res.status(500);
+    }
+    if (data) return data;
     return res.status(HttpStatus.NOT_FOUND).json({ message: error });
   }
 }

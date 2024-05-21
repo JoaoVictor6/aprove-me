@@ -5,19 +5,25 @@ import { API_LOGIN, API_PASSWORD } from './constants';
 import { PRISMA_NOT_FOUND_ERROR_CODE } from './prisma.constants';
 import { PrismaService } from './prisma.service';
 
+type DefaultReturn<DataReturn = payable> =
+  | { error: null; data: DataReturn }
+  | { error: unknown; data: null };
+
 interface IIntegrationsService {
   createCredentials: (props: {
     password: string;
     login: string;
-  }) => { error: null; token: string } | { error: Error; token: null };
+    // TODO: Normalize this return. Return data object instead of token prop
+  }) => { error: null; token: string } | { error: unknown; token: null };
 
-  findPayable: (
-    id: string,
-  ) => Promise<{ data: payable; error: null } | { data: null; error: unknown }>;
+  findPayable: (id: string) => Promise<DefaultReturn>;
 
-  deletePayable: (
+  deletePayable: (id: string) => Promise<DefaultReturn>;
+
+  updatePayable: (
     id: string,
-  ) => Promise<{ data: payable; error: null } | { data: null; error: unknown }>;
+    payable: Partial<Omit<payable, 'id'>>,
+  ) => Promise<DefaultReturn>;
 }
 
 @Injectable()
@@ -79,6 +85,22 @@ export class IntegrationsService implements IIntegrationsService {
         data: null,
         error: error,
       };
+    }
+  }
+
+  async updatePayable(
+    id: string,
+    payable: Partial<Omit<payable, 'id'>>,
+  ): ReturnType<IIntegrationsService['updatePayable']> {
+    try {
+      const data = await this.prismaService.payable.update({
+        where: { id },
+        data: payable,
+      });
+      return { data, error: null };
+    } catch (error) {
+      console.error(error);
+      return { data: null, error };
     }
   }
 }
