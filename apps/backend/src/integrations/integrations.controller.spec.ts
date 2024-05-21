@@ -40,6 +40,7 @@ describe('IntegrationsController /integrations', () => {
             findPayable: () => {},
             deletePayable: () => {},
             updatePayable: () => {},
+            createPayable: () => {},
           },
         },
       ],
@@ -311,6 +312,71 @@ describe('IntegrationsController /integrations', () => {
       expect(responseStatusMethodStub).toHaveBeenCalledWith(
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
+    });
+  });
+
+  describe('POST: /payable', () => {
+    it('save payable item on database', async () => {
+      const { responseStub } = getResponseStub();
+      const payableMock = payableFactory();
+      const expectedPropsPassedOnCreatePayable = {
+        assignor: payableMock.assignor,
+        emissionDate: payableMock.emissionDate,
+        value: payableMock.value,
+      };
+      const createPayableSpy = jest.fn();
+      jest.spyOn(service, 'createPayable').mockImplementation(createPayableSpy);
+      createPayableSpy.mockResolvedValue({ data: null, error: null });
+
+      await controller.createPayable(
+        expectedPropsPassedOnCreatePayable,
+        responseStub,
+      );
+
+      expect(createPayableSpy).toHaveBeenCalledWith(
+        expectedPropsPassedOnCreatePayable,
+      );
+    });
+    it('send internal error status if receive a unhandled error', async () => {
+      const { responseStub, responseStatusMethodStub } = getResponseStub();
+      const payableMock = payableFactory();
+      const expectedPropsPassedOnCreatePayable = {
+        assignor: payableMock.assignor,
+        emissionDate: payableMock.emissionDate,
+        value: payableMock.value,
+      };
+      jest.spyOn(service, 'createPayable').mockImplementation(async () => ({
+        data: null,
+        error: new Error('UNHANDLED'),
+      }));
+
+      await controller.createPayable(
+        expectedPropsPassedOnCreatePayable,
+        responseStub,
+      );
+
+      expect(responseStatusMethodStub).toHaveBeenCalledWith(
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    });
+    it('return created payable object', async () => {
+      const { responseStub } = getResponseStub();
+      const payableMock = payableFactory();
+      const expectedPropsPassedOnCreatePayable = {
+        assignor: payableMock.assignor,
+        emissionDate: payableMock.emissionDate,
+        value: payableMock.value,
+      };
+      const createPayableSpy = jest.fn();
+      jest.spyOn(service, 'createPayable').mockImplementation(createPayableSpy);
+      createPayableSpy.mockResolvedValue({ data: payableMock, error: null });
+
+      const returnedValue = await controller.createPayable(
+        expectedPropsPassedOnCreatePayable,
+        responseStub,
+      );
+
+      expect(returnedValue).toStrictEqual(payableMock);
     });
   });
 });

@@ -24,6 +24,10 @@ interface IIntegrationsService {
     id: string,
     payable: Partial<Omit<payable, 'id'>>,
   ) => Promise<DefaultReturn>;
+
+  createPayable: (
+    payable: Partial<Omit<payable, 'id'>>,
+  ) => Promise<DefaultReturn>;
 }
 
 @Injectable()
@@ -96,6 +100,24 @@ export class IntegrationsService implements IIntegrationsService {
       const data = await this.prismaService.payable.update({
         where: { id },
         data: payable,
+      });
+      return { data, error: null };
+    } catch (error) {
+      console.error(error);
+      return { data: null, error };
+    }
+  }
+
+  async createPayable(
+    payable: Partial<Omit<payable, 'id'>>,
+  ): ReturnType<IIntegrationsService['updatePayable']> {
+    try {
+      const data = await this.prismaService.payable.create({
+        data: {
+          value: payable.value,
+          assignor: payable.assignor,
+          emissionDate: payable.emissionDate,
+        },
       });
       return { data, error: null };
     } catch (error) {

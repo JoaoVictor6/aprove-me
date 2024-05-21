@@ -15,6 +15,7 @@ import { payable } from 'database';
 import { Response } from 'express';
 import { z } from 'zod';
 import { AuthDTO } from './DTO/auth.dto';
+import { CreatePayableDTO } from './DTO/createPayable.dto';
 import { EditPayableDTO } from './DTO/editPayable.DTO';
 import { IntegrationsService } from './integrations.service';
 const verifyId = (id: string) => {
@@ -100,5 +101,21 @@ export class IntegrationsController {
     }
     if (data) return data;
     return res.status(HttpStatus.NOT_FOUND).json({ message: error });
+  }
+
+  @Post('payable')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async createPayable(
+    @Body() createPayableDto: CreatePayableDTO,
+    @Res() res: Response,
+  ) {
+    const { data, error } =
+      await this.integrationsService.createPayable(createPayableDto);
+
+    if (error) {
+      // unhandled error
+      return res.status(500);
+    }
+    return data;
   }
 }
