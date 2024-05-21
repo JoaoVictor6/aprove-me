@@ -240,7 +240,7 @@ describe('IntegrationsController /integrations', () => {
     });
   });
 
-  describe.only('PUT: /payable/:id', () => {
+  describe('PUT: /payable/:id', () => {
     it('return bad request status if id value is not valid', async () => {
       const { responseStub, responseStatusMethodStub } = getResponseStub();
       const payableMock = payableFactory();
