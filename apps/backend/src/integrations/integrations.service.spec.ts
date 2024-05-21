@@ -6,6 +6,7 @@ import { IntegrationsService } from './integrations.service';
 import { PRISMA_NOT_FOUND_ERROR_CODE } from './prisma.constants';
 import { PrismaService } from './prisma.service';
 import { assignorFactory } from './utils/test/assignorFactory';
+import { payableFactory } from './utils/test/payableFactory';
 
 describe('IntegrationsService', () => {
   let service: IntegrationsService;
@@ -18,8 +19,16 @@ describe('IntegrationsService', () => {
         {
           provide: PrismaService,
           useValue: {
-            payable: { findUniqueOrThrow: jest.fn(), delete: jest.fn() },
-            assignor: { findUniqueOrThrow: jest.fn(), delete: jest.fn() },
+            payable: {
+              findUniqueOrThrow: jest.fn(),
+              delete: jest.fn(),
+              update: jest.fn(),
+            },
+            assignor: {
+              findUniqueOrThrow: jest.fn(),
+              delete: jest.fn(),
+              update: jest.fn(),
+            },
           },
         },
         {
@@ -210,6 +219,87 @@ describe('IntegrationsService', () => {
 
       expect(data).toStrictEqual(null);
       expect(error).toStrictEqual(null);
+    });
+  });
+  describe('updatePayable', () => {
+    it('update database item based on assignor id', async () => {
+      const id = 'valid_id';
+      const prismaUpdateSpy = jest.fn();
+      jest
+        .spyOn(prismaService.payable, 'update')
+        .mockImplementation(prismaUpdateSpy);
+
+      service.updatePayable(id, payableFactory());
+
+      expect(prismaUpdateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id } }),
+      );
+    });
+    it('fill error prop if throw a error', async () => {
+      const randomError = new Error('FOO');
+      jest.spyOn(prismaService.payable, 'update').mockImplementation(() => {
+        throw randomError;
+      });
+
+      const { error } = await service.updatePayable(
+        'VALID_ID',
+        payableFactory(),
+      );
+
+      expect(error).toStrictEqual(randomError);
+    });
+    it('fill data with updated field', async () => {
+      const payableMock = payableFactory();
+      jest
+        .spyOn(prismaService.payable, 'update')
+        // @ts-expect-error prisma function return
+        .mockImplementation(() => payableMock);
+
+      const { data } = await service.updatePayable(payableMock.id, payableMock);
+
+      expect(data).toStrictEqual(payableMock);
+    });
+  });
+  describe('updateAssignor', () => {
+    it('update database item based on assignor id', async () => {
+      const id = 'valid_id';
+      const prismaUpdateSpy = jest.fn();
+      jest
+        .spyOn(prismaService.assignor, 'update')
+        .mockImplementation(prismaUpdateSpy);
+
+      service.updateAssignor(id, assignorFactory());
+
+      expect(prismaUpdateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ where: { id } }),
+      );
+    });
+    it('fill error prop if throw a error', async () => {
+      const randomError = new Error('FOO');
+      jest.spyOn(prismaService.assignor, 'update').mockImplementation(() => {
+        throw randomError;
+      });
+
+      const { error } = await service.updateAssignor(
+        'VALID_ID',
+        assignorFactory(),
+      );
+
+      expect(error).toStrictEqual(randomError);
+    });
+    it('fill data with updated field', async () => {
+      const assignorMock = assignorFactory();
+      jest
+        .spyOn(prismaService.assignor, 'update')
+        // @ts-expect-error prisma function return
+        .mockImplementation(() => assignorMock);
+
+      const { data } = await service.updateAssignor(
+        assignorMock.id,
+        assignorMock,
+      );
+
+      expect(data).toStrictEqual(assignorMock);
     });
   });
 });
