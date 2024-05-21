@@ -16,7 +16,10 @@ describe('IntegrationsService', () => {
         IntegrationsService,
         {
           provide: PrismaService,
-          useValue: { payable: { findUniqueOrThrow: jest.fn() } },
+          useValue: {
+            payable: { findUniqueOrThrow: jest.fn() },
+            assignor: { findUniqueOrThrow: jest.fn() },
+          },
         },
         {
           provide: JwtService,
@@ -96,6 +99,38 @@ describe('IntegrationsService', () => {
         });
 
       const { error, data } = await service.findPayable('anything');
+
+      expect(error).toStrictEqual(null);
+      expect(data).toStrictEqual(null);
+    });
+  });
+  describe('findAssignor', () => {
+    it('return error property filled if occurs some error on prisma', async () => {
+      const genericError = new Error('FOO');
+      jest
+        .spyOn(prismaService.assignor, 'findUniqueOrThrow')
+        .mockImplementation(() => {
+          throw genericError;
+        });
+
+      const { error } = await service.findAssignor('anything');
+
+      expect(error).toStrictEqual(genericError);
+    });
+
+    it('return data and error fields empty if not found', async () => {
+      jest
+        .spyOn(prismaService.assignor, 'findUniqueOrThrow')
+        //@ts-expect-error Prisma type error, not problem
+        .mockImplementation(async () => {
+          throw new Prisma.PrismaClientKnownRequestError('NOt found', {
+            code: PRISMA_NOT_FOUND_ERROR_CODE,
+            clientVersion: '',
+            batchRequestIdx: 1,
+          });
+        });
+
+      const { error, data } = await service.findAssignor('anything');
 
       expect(error).toStrictEqual(null);
       expect(data).toStrictEqual(null);
