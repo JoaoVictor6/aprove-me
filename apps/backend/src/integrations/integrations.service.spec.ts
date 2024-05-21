@@ -5,6 +5,7 @@ import { API_LOGIN, API_PASSWORD } from './constants';
 import { IntegrationsService } from './integrations.service';
 import { PRISMA_NOT_FOUND_ERROR_CODE } from './prisma.constants';
 import { PrismaService } from './prisma.service';
+import { assignorFactory } from './utils/test/assignorFactory';
 
 describe('IntegrationsService', () => {
   let service: IntegrationsService;
@@ -17,8 +18,8 @@ describe('IntegrationsService', () => {
         {
           provide: PrismaService,
           useValue: {
-            payable: { findUniqueOrThrow: jest.fn() },
-            assignor: { findUniqueOrThrow: jest.fn() },
+            payable: { findUniqueOrThrow: jest.fn(), delete: jest.fn() },
+            assignor: { findUniqueOrThrow: jest.fn(), delete: jest.fn() },
           },
         },
         {
@@ -28,16 +29,7 @@ describe('IntegrationsService', () => {
           },
         },
       ],
-      imports: [
-        // JwtModule.register({
-        //   secret: process.env.JWT_SECRET,
-        //   signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
-        // }),
-        // {
-        //   module: JwtModule,
-        //   providers: [ {provide: } ]
-        // }
-      ],
+      imports: [],
     }).compile();
 
     service = module.get<IntegrationsService>(IntegrationsService);
@@ -134,6 +126,90 @@ describe('IntegrationsService', () => {
 
       expect(error).toStrictEqual(null);
       expect(data).toStrictEqual(null);
+    });
+  });
+  describe('deletePayable', () => {
+    it('use payable id to search on database', async () => {
+      const expectedPayableObject = assignorFactory();
+      const prismaPayableDeleteMethod = jest.fn();
+      jest
+        .spyOn(prismaService.payable, 'delete')
+        .mockImplementation(prismaPayableDeleteMethod);
+
+      service.deletePayable(expectedPayableObject.id);
+
+      expect(prismaPayableDeleteMethod).toHaveBeenCalledWith({
+        where: { id: expectedPayableObject.id },
+      });
+    });
+    it('return deleted data', async () => {
+      const expectedPayableObject = assignorFactory();
+      jest
+        .spyOn(prismaService.payable, 'delete')
+        // @ts-expect-error prisma function return
+        .mockImplementation(() => expectedPayableObject);
+
+      const { data } = await service.deletePayable('VALID_ID');
+
+      expect(data).toStrictEqual(expectedPayableObject);
+    });
+    it('return data and error null if not found payable item', async () => {
+      jest
+        .spyOn(prismaService.payable, 'delete')
+        // @ts-expect-error prisma function return
+        .mockImplementation(async () => {
+          throw new Prisma.PrismaClientKnownRequestError('', {
+            code: PRISMA_NOT_FOUND_ERROR_CODE,
+            clientVersion: '1',
+          });
+        });
+
+      const { data, error } = await service.deletePayable('ANY_ID');
+
+      expect(data).toStrictEqual(null);
+      expect(error).toStrictEqual(null);
+    });
+  });
+  describe('deleteAssignor', () => {
+    it('use assignor id to search on database', async () => {
+      const expectedAssignorObject = assignorFactory();
+      const prismaAssignorDeleteMethod = jest.fn();
+      jest
+        .spyOn(prismaService.assignor, 'delete')
+        .mockImplementation(prismaAssignorDeleteMethod);
+
+      service.deleteAssignor(expectedAssignorObject.id);
+
+      expect(prismaAssignorDeleteMethod).toHaveBeenCalledWith({
+        where: { id: expectedAssignorObject.id },
+      });
+    });
+    it('return deleted data', async () => {
+      const expectedAssignorObject = assignorFactory();
+      jest
+        .spyOn(prismaService.assignor, 'delete')
+        // @ts-expect-error prisma function return
+        .mockImplementation(() => expectedAssignorObject);
+
+      const { data } = await service.deleteAssignor('VALID_ID');
+
+      expect(data).toStrictEqual(expectedAssignorObject);
+    });
+    it('return data and error null if not found assignor item', async () => {
+      jest
+        .spyOn(prismaService.assignor, 'delete')
+        // @ts-expect-error prisma function return
+        .mockImplementation(async () => {
+          throw new Prisma.PrismaClientKnownRequestError('', {
+            code: PRISMA_NOT_FOUND_ERROR_CODE,
+            clientVersion: '1',
+          });
+        });
+
+      const { data, error } = await service.deleteAssignor('ANY_ID');
+
+      expect(data).toStrictEqual(null);
+      expect(error).toStrictEqual(null);
     });
   });
 });
