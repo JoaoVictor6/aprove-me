@@ -154,7 +154,6 @@ export class IntegrationsService implements IIntegrationsService {
       });
       return { data, error: null };
     } catch (error) {
-      console.error(error);
       return { data: null, error };
     }
   }
@@ -170,7 +169,6 @@ export class IntegrationsService implements IIntegrationsService {
       });
       return { data, error: null };
     } catch (error) {
-      console.error(error);
       return { data: null, error };
     }
   }
@@ -188,7 +186,6 @@ export class IntegrationsService implements IIntegrationsService {
       });
       return { data, error: null };
     } catch (error) {
-      console.error(error);
       return { data: null, error };
     }
   }
@@ -204,7 +201,6 @@ export class IntegrationsService implements IIntegrationsService {
       });
       return { data, error: null };
     } catch (error) {
-      console.error(error);
       return { data: null, error };
     }
   }
