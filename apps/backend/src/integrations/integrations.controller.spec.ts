@@ -2,9 +2,11 @@ import { faker } from '@faker-js/faker';
 import { HttpStatus } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Prisma } from 'database';
 import { Response } from 'express';
 import { IntegrationsController } from './integrations.controller';
 import { IntegrationsService } from './integrations.service';
+import { PRISMA_FOREIGN_KEY_CONSTRAINT_FAILED } from './prisma.constants';
 import { payableFactory } from './utils/test/payableFactory';
 const getResponseStub = () => {
   const responseStatusMethodStub = jest.fn();
@@ -377,6 +379,33 @@ describe('IntegrationsController /integrations', () => {
       );
 
       expect(returnedValue).toStrictEqual(payableMock);
+    });
+    it('return bad request status if assignor id not exists on database', async () => {
+      const createPayableSpy = jest.fn();
+      jest.spyOn(service, 'createPayable').mockImplementation(createPayableSpy);
+      createPayableSpy.mockResolvedValue({
+        data: null,
+        error: new Prisma.PrismaClientKnownRequestError(
+          'Foreign key constraint failed on the field: assignor',
+          { code: PRISMA_FOREIGN_KEY_CONSTRAINT_FAILED, clientVersion: '1' },
+        ),
+      });
+      const { responseStub, responseStatusMethodStub } = getResponseStub();
+      const payableMock = payableFactory();
+      const expectedPropsPassedOnCreatePayable = {
+        assignor: payableMock.assignor,
+        emissionDate: payableMock.emissionDate,
+        value: payableMock.value,
+      };
+
+      await controller.createPayable(
+        expectedPropsPassedOnCreatePayable,
+        responseStub,
+      );
+
+      expect(responseStatusMethodStub).toHaveBeenCalledWith(
+        HttpStatus.BAD_REQUEST,
+      );
     });
   });
 });
