@@ -1,6 +1,7 @@
-import { JwtModule } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Prisma } from 'database';
+import { API_LOGIN, API_PASSWORD } from './constants';
 import { IntegrationsService } from './integrations.service';
 import { PRISMA_NOT_FOUND_ERROR_CODE } from './prisma.constants';
 import { PrismaService } from './prisma.service';
@@ -8,7 +9,7 @@ import { PrismaService } from './prisma.service';
 describe('IntegrationsService', () => {
   let service: IntegrationsService;
   let prismaService: PrismaService;
-
+  let jwtService: JwtService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -17,16 +18,27 @@ describe('IntegrationsService', () => {
           provide: PrismaService,
           useValue: { payable: { findUniqueOrThrow: jest.fn() } },
         },
+        {
+          provide: JwtService,
+          useValue: {
+            sign: () => {},
+          },
+        },
       ],
       imports: [
-        JwtModule.register({
-          secret: process.env.JWT_SECRET,
-          signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
-        }),
+        // JwtModule.register({
+        //   secret: process.env.JWT_SECRET,
+        //   signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
+        // }),
+        // {
+        //   module: JwtModule,
+        //   providers: [ {provide: } ]
+        // }
       ],
     }).compile();
 
     service = module.get<IntegrationsService>(IntegrationsService);
+    jwtService = module.get<JwtService>(JwtService);
     prismaService = module.get<PrismaService>(PrismaService);
   });
 
@@ -34,6 +46,29 @@ describe('IntegrationsService', () => {
     expect(service).toBeDefined();
   });
 
+  describe('createCredentials', () => {
+    it('Create JWT token', () => {
+      const signSpy = jest.fn();
+      jest.spyOn(jwtService, 'sign').mockImplementation(signSpy);
+
+      service.createCredentials({
+        login: API_LOGIN,
+        password: API_PASSWORD,
+      });
+
+      expect(signSpy).toHaveBeenCalled();
+    });
+
+    it('verify login and password', () => {
+      const { error } = service.createCredentials({
+        login: 'WRONG_LOGIN',
+        password: 'WRONG_PASSWORD',
+      });
+
+      expect(error).toBeInstanceOf(Error);
+      expect((error as Error).message).toStrictEqual('Credentials');
+    });
+  });
   describe('findPayable', () => {
     it('return error property filled if occurs some error on prisma', async () => {
       const genericError = new Error('FOO');
