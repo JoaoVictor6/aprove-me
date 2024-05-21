@@ -105,7 +105,7 @@ describe('IntegrationsController /integrations', () => {
     it('Return bad request status if id value is not valid', async () => {
       const { responseStub, responseStatusMethodStub } = getResponseStub();
 
-      await controller.findUniquePayable('INVALID_ID', responseStub);
+      await controller.findUniquePayable({ id: 'INVALID_ID' }, responseStub);
 
       expect(responseStatusMethodStub).toHaveBeenCalledWith(
         HttpStatus.BAD_REQUEST,
@@ -115,7 +115,7 @@ describe('IntegrationsController /integrations', () => {
     it('send a json with message prop when occurs any error', async () => {
       const { responseStub, responseJsonMethodStub } = getResponseStub();
 
-      await controller.findUniquePayable('INVALID_ID', responseStub);
+      await controller.findUniquePayable({ id: 'INVALID_ID' }, responseStub);
 
       expect(responseJsonMethodStub).toHaveBeenCalledWith(
         expect.objectContaining({ message: expect.anything() }),
@@ -128,7 +128,10 @@ describe('IntegrationsController /integrations', () => {
         .spyOn(service, 'findPayable')
         .mockImplementation(async () => ({ data: null, error: null }));
 
-      await controller.findUniquePayable(faker.string.uuid(), responseStub);
+      await controller.findUniquePayable(
+        { id: faker.string.uuid() },
+        responseStub,
+      );
 
       expect(responseStatusMethodStub).toHaveBeenCalledWith(
         HttpStatus.NOT_FOUND,
@@ -145,7 +148,7 @@ describe('IntegrationsController /integrations', () => {
       }));
 
       const returnedValue = await controller.findUniquePayable(
-        payableMock.id,
+        { id: payableMock.id },
         responseStub,
       );
 
@@ -160,7 +163,7 @@ describe('IntegrationsController /integrations', () => {
         error: new Error('Unhandled'),
       }));
 
-      await controller.findUniquePayable(payableIdMock, responseStub);
+      await controller.findUniquePayable({ id: payableIdMock }, responseStub);
 
       expect(responseStatusMethodStub).toHaveBeenCalledWith(
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -172,7 +175,7 @@ describe('IntegrationsController /integrations', () => {
     it('return bad request status if id value is not valid', async () => {
       const { responseStub, responseStatusMethodStub } = getResponseStub();
 
-      await controller.deleteUniquePayable('INVALID_ID', responseStub);
+      await controller.deleteUniquePayable({ id: 'INVALID_ID' }, responseStub);
 
       expect(responseStatusMethodStub).toHaveBeenCalledWith(
         HttpStatus.BAD_REQUEST,
@@ -185,7 +188,10 @@ describe('IntegrationsController /integrations', () => {
         .spyOn(service, 'deletePayable')
         .mockImplementation(async () => ({ data: null, error: null }));
 
-      await controller.deleteUniquePayable(faker.string.uuid(), responseStub);
+      await controller.deleteUniquePayable(
+        { id: faker.string.uuid() },
+        responseStub,
+      );
 
       expect(responseStatusMethodStub).toHaveBeenCalledWith(
         HttpStatus.NOT_FOUND,
@@ -200,7 +206,7 @@ describe('IntegrationsController /integrations', () => {
         error: new Error('Unhandled'),
       }));
 
-      await controller.deleteUniquePayable(payableIdMock, responseStub);
+      await controller.deleteUniquePayable({ id: payableIdMock }, responseStub);
 
       expect(responseStatusMethodStub).toHaveBeenCalledWith(
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -217,7 +223,7 @@ describe('IntegrationsController /integrations', () => {
       }));
 
       const returnedValue = await controller.deleteUniquePayable(
-        payableMock.id,
+        { id: payableMock.id },
         responseStub,
       );
 
@@ -232,7 +238,7 @@ describe('IntegrationsController /integrations', () => {
         error: new Error('Unhandled'),
       }));
 
-      await controller.deleteUniquePayable(payableIdMock, responseStub);
+      await controller.deleteUniquePayable({ id: payableIdMock }, responseStub);
 
       expect(responseStatusMethodStub).toHaveBeenCalledWith(
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -246,7 +252,7 @@ describe('IntegrationsController /integrations', () => {
       const payableMock = payableFactory();
 
       await controller.updateUniquePayable(
-        'INVALID_ID',
+        { id: 'INVALID_ID' },
         payableMock,
         responseStub,
       );
@@ -264,7 +270,7 @@ describe('IntegrationsController /integrations', () => {
         .mockImplementation(async () => ({ data: null, error: null }));
 
       await controller.updateUniquePayable(
-        payableMock.id,
+        { id: payableMock.id },
         payableMock,
         responseStub,
       );
@@ -284,7 +290,7 @@ describe('IntegrationsController /integrations', () => {
       }));
 
       const returnedValue = await controller.updateUniquePayable(
-        payableMock.id,
+        { id: payableMock.id },
         payableMock,
         responseStub,
       );
@@ -293,18 +299,14 @@ describe('IntegrationsController /integrations', () => {
     });
 
     it('return internal error code for unhandled errors', async () => {
-      const payableMock = payableFactory();
+      const { id, ...payableMock } = payableFactory();
       const { responseStub, responseStatusMethodStub } = getResponseStub();
       jest.spyOn(service, 'updatePayable').mockImplementation(async () => ({
         data: null,
         error: new Error('Unhandled'),
       }));
 
-      await controller.updateUniquePayable(
-        payableMock.id,
-        payableMock,
-        responseStub,
-      );
+      await controller.updateUniquePayable({ id }, payableMock, responseStub);
 
       expect(responseStatusMethodStub).toHaveBeenCalledWith(
         HttpStatus.INTERNAL_SERVER_ERROR,

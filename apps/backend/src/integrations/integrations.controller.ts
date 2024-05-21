@@ -8,6 +8,8 @@ import {
   Post,
   Put,
   Res,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { payable } from 'database';
 import { Response } from 'express';
@@ -38,7 +40,7 @@ export class IntegrationsController {
 
   @Get('payable/:id')
   async findUniquePayable(
-    @Param() id: string,
+    @Param() { id }: { id: string },
     @Res() res: Response,
   ): Promise<payable | Response> {
     const { isUUID } = verifyId(id);
@@ -58,7 +60,7 @@ export class IntegrationsController {
 
   @Delete('payable/:id')
   async deleteUniquePayable(
-    @Param() id: string,
+    @Param() { id }: { id: string },
     @Res() res: Response,
   ): Promise<payable | Response> {
     const { isUUID } = verifyId(id);
@@ -77,8 +79,9 @@ export class IntegrationsController {
   }
 
   @Put('payable/:id')
+  @UsePipes(new ValidationPipe({ transform: true }))
   async updateUniquePayable(
-    @Param() id: string,
+    @Param() { id }: { id: string },
     @Body() editPayableDTO: EditPayableDTO,
     @Res() res: Response,
   ) {
