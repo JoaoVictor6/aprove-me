@@ -30,14 +30,14 @@ export class IntegrationsController {
   constructor(private readonly integrationsService: IntegrationsService) {}
   @Post('auth')
   auth(@Body() authDTO: AuthDTO, @Res() res: Response) {
-    const { error: createCredentialsError, token: credentialToken } =
+    const { error: createCredentialsError, data } =
       this.integrationsService.createCredentials(authDTO);
     if (createCredentialsError) {
       return res
         .status(HttpStatus.UNAUTHORIZED)
         .json({ message: 'Invalid credentials' });
     }
-    return res.status(HttpStatus.OK).json({ token: credentialToken });
+    return res.status(HttpStatus.OK).json({ token: data.token });
   }
 
   @Get('payable/:id')

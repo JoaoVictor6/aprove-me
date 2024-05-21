@@ -67,7 +67,7 @@ describe('IntegrationsController /integrations', () => {
       const { responseStub, responseStatusMethodStub } = getResponseStub();
       jest
         .spyOn(service, 'createCredentials')
-        .mockReturnValue({ error: new Error('any'), token: null });
+        .mockReturnValue({ error: new Error('any'), data: null });
 
       controller.auth(
         {
@@ -89,7 +89,7 @@ describe('IntegrationsController /integrations', () => {
       };
       jest
         .spyOn(service, 'createCredentials')
-        .mockReturnValue({ error: null, token: 'any' });
+        .mockReturnValue({ error: null, data: { token: 'any' } });
 
       controller.auth(
         {

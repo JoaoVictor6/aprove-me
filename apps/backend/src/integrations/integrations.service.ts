@@ -13,8 +13,7 @@ interface IIntegrationsService {
   createCredentials: (props: {
     password: string;
     login: string;
-    // TODO: Normalize this return. Return data object instead of token prop
-  }) => { error: null; token: string } | { error: unknown; token: null };
+  }) => DefaultReturn<{ token: string }>;
 
   findPayable: (id: string) => Promise<DefaultReturn>;
 
@@ -43,12 +42,12 @@ export class IntegrationsService implements IIntegrationsService {
     if (password !== API_PASSWORD || login !== API_LOGIN) {
       return {
         error: new Error('Credentials'),
-        token: null,
+        data: null,
       };
     }
     return {
       error: null,
-      token: this.jwtService.sign({ id: 'aproveme' }),
+      data: { token: this.jwtService.sign({ id: 'aproveme' }) },
     };
   }
   async findPayable(
