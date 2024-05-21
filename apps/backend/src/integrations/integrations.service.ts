@@ -14,6 +14,10 @@ interface IIntegrationsService {
   findPayable: (
     id: string,
   ) => Promise<{ data: payable; error: null } | { data: null; error: unknown }>;
+
+  deletePayable: (
+    id: string,
+  ) => Promise<{ data: payable; error: null } | { data: null; error: unknown }>;
 }
 
 @Injectable()
@@ -45,6 +49,26 @@ export class IntegrationsService implements IIntegrationsService {
         where: { id },
       });
 
+      return { data, error: null };
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === PRISMA_NOT_FOUND_ERROR_CODE)
+          return { data: null, error: null };
+      }
+      return {
+        data: null,
+        error: error,
+      };
+    }
+  }
+
+  async deletePayable(
+    id: string,
+  ): ReturnType<IIntegrationsService['deletePayable']> {
+    try {
+      const data = await this.prismaService.payable.delete({
+        where: { id },
+      });
       return { data, error: null };
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -43,6 +44,26 @@ export class IntegrationsController {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid id' });
     }
     const { data, error } = await this.integrationsService.findPayable(id);
+    if (error) {
+      // unhandled error
+      return res.status(500);
+    }
+
+    if (data) return data;
+
+    return res.status(HttpStatus.NOT_FOUND).json({ message: error });
+  }
+
+  @Delete('payable/:id')
+  async deleteUniquePayable(
+    @Param() id: string,
+    @Res() res: Response,
+  ): Promise<payable | Response> {
+    const { isUUID } = verifyId(id);
+    if (!isUUID) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid id' });
+    }
+    const { data, error } = await this.integrationsService.deletePayable(id);
     if (error) {
       // unhandled error
       return res.status(500);
