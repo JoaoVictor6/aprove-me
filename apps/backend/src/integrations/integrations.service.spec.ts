@@ -106,6 +106,18 @@ describe('IntegrationsService', () => {
       expect(error).toStrictEqual(null);
       expect(data).toStrictEqual(null);
     });
+
+    it('return found payable item', async () => {
+      const payableMock = payableFactory();
+      jest
+        .spyOn(prismaService.payable, 'findUniqueOrThrow')
+        // @ts-expect-error prisma function return type
+        .mockImplementation(() => payableMock);
+
+      const { data } = await service.findPayable(payableMock.id);
+
+      expect(data).toStrictEqual(payableMock);
+    });
   });
   describe('findAssignor', () => {
     it('return error property filled if occurs some error on prisma', async () => {
@@ -137,6 +149,18 @@ describe('IntegrationsService', () => {
 
       expect(error).toStrictEqual(null);
       expect(data).toStrictEqual(null);
+    });
+
+    it('return found assignor item', async () => {
+      const assignorMock = assignorFactory();
+      jest
+        .spyOn(prismaService.assignor, 'findUniqueOrThrow')
+        // @ts-expect-error prisma function return type
+        .mockImplementation(() => assignorMock);
+
+      const { data } = await service.findAssignor(assignorMock.id);
+
+      expect(data).toStrictEqual(assignorMock);
     });
   });
   describe('deletePayable', () => {
@@ -180,6 +204,19 @@ describe('IntegrationsService', () => {
       expect(data).toStrictEqual(null);
       expect(error).toStrictEqual(null);
     });
+    it('return error props filled if occurs some error', async () => {
+      const unhandledError = new Error('any');
+      jest
+        .spyOn(prismaService.payable, 'delete')
+        // @ts-expect-error prisma function return
+        .mockImplementation(async () => {
+          throw unhandledError;
+        });
+
+      const { error } = await service.deletePayable('ANY_ID');
+
+      expect(error).toStrictEqual(unhandledError);
+    });
   });
   describe('deleteAssignor', () => {
     it('use assignor id to search on database', async () => {
@@ -221,6 +258,19 @@ describe('IntegrationsService', () => {
 
       expect(data).toStrictEqual(null);
       expect(error).toStrictEqual(null);
+    });
+    it('return error props filled if occurs some error', async () => {
+      const unhandledError = new Error('any');
+      jest
+        .spyOn(prismaService.assignor, 'delete')
+        // @ts-expect-error prisma function return
+        .mockImplementation(async () => {
+          throw unhandledError;
+        });
+
+      const { error } = await service.deleteAssignor('ANY_ID');
+
+      expect(error).toStrictEqual(unhandledError);
     });
   });
   describe('updatePayable', () => {
