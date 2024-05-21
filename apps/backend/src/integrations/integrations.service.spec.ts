@@ -23,11 +23,13 @@ describe('IntegrationsService', () => {
               findUniqueOrThrow: jest.fn(),
               delete: jest.fn(),
               update: jest.fn(),
+              create: jest.fn(),
             },
             assignor: {
               findUniqueOrThrow: jest.fn(),
               delete: jest.fn(),
               update: jest.fn(),
+              create: jest.fn(),
             },
           },
         },
@@ -300,6 +302,88 @@ describe('IntegrationsService', () => {
       );
 
       expect(data).toStrictEqual(assignorMock);
+    });
+  });
+  describe('createPayable', () => {
+    it('if occurs some error, fill error field', async () => {
+      const randomError = new Error('random error');
+      jest
+        .spyOn(prismaService.payable, 'create')
+        // @ts-expect-error error on prisma return type
+        .mockImplementation(async () => {
+          throw randomError;
+        });
+
+      const { error } = await service.createPayable(payableFactory());
+
+      expect(error).toStrictEqual(randomError);
+    });
+    it('return created payable item', async () => {
+      const payableMock = payableFactory();
+      const prismaCreateSpy = jest.fn();
+      prismaCreateSpy.mockResolvedValue(payableMock);
+      jest
+        .spyOn(prismaService.payable, 'create')
+        .mockImplementation(prismaCreateSpy);
+
+      const { data } = await service.createPayable(payableMock);
+
+      expect(data).toStrictEqual(payableMock);
+    });
+    it('create new payable on database', async () => {
+      const payableMock = payableFactory();
+      delete payableMock.id;
+      const prismaCreateSpy = jest.fn();
+      jest
+        .spyOn(prismaService.payable, 'create')
+        .mockImplementation(prismaCreateSpy);
+
+      await service.createPayable(payableMock);
+
+      expect(prismaCreateSpy).toHaveBeenCalledWith({
+        data: payableMock,
+      });
+    });
+  });
+  describe('createAssignor', () => {
+    it('if occurs some error, fill error field', async () => {
+      const randomError = new Error('random error');
+      jest
+        .spyOn(prismaService.assignor, 'create')
+        // @ts-expect-error error on prisma return type
+        .mockImplementation(async () => {
+          throw randomError;
+        });
+
+      const { error } = await service.createAssignor(assignorFactory());
+
+      expect(error).toStrictEqual(randomError);
+    });
+    it('return created assignor item', async () => {
+      const assignorMock = assignorFactory();
+      const prismaCreateSpy = jest.fn();
+      prismaCreateSpy.mockResolvedValue(assignorMock);
+      jest
+        .spyOn(prismaService.assignor, 'create')
+        .mockImplementation(prismaCreateSpy);
+
+      const { data } = await service.createAssignor(assignorMock);
+
+      expect(data).toStrictEqual(assignorMock);
+    });
+    it('create new assignor on database', async () => {
+      const assignorMock = assignorFactory();
+      delete assignorMock.id;
+      const prismaCreateSpy = jest.fn();
+      jest
+        .spyOn(prismaService.assignor, 'create')
+        .mockImplementation(prismaCreateSpy);
+
+      await service.createAssignor(assignorMock);
+
+      expect(prismaCreateSpy).toHaveBeenCalledWith({
+        data: assignorMock,
+      });
     });
   });
 });
