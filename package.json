@@ -6,7 +6,8 @@
   "scripts": {
     "dev:backend": "pnpm --filter=backend run start:dev",
     "dev:frontend": "pnpm --filter=frontend run dev",
-    "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\""
+    "dev:database": "pnpm --filter=database run dev",
+    "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:frontend\" \"pnpm run dev:database\""
   },
   "keywords": [],
   "author": "",
