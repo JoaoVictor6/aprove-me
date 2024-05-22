@@ -57,7 +57,7 @@ export class IntegrationsController {
       return res.status(500);
     }
 
-    if (data) return data;
+    if (data) return res.json(data);
 
     return res.status(HttpStatus.NOT_FOUND).json({ message: error });
   }
@@ -77,7 +77,7 @@ export class IntegrationsController {
       return res.status(500);
     }
 
-    if (data) return data;
+    if (data) return res.json(data);
 
     return res.status(HttpStatus.NOT_FOUND).json({ message: error });
   }
@@ -102,7 +102,7 @@ export class IntegrationsController {
       // unhandled error
       return res.status(500);
     }
-    if (data) return data;
+    if (data) return res.json(data);
     return res.status(HttpStatus.NOT_FOUND).json({ message: error });
   }
 
@@ -126,7 +126,7 @@ export class IntegrationsController {
       // unhandled error
       return res.status(500);
     }
-    return data;
+    return res.json(data);
   }
 
   @Get('assignor/:id')
@@ -144,7 +144,7 @@ export class IntegrationsController {
       return res.status(500);
     }
 
-    if (data) return data;
+    if (data) return res.json(data);
 
     return res.status(HttpStatus.NOT_FOUND).json({ message: error });
   }
@@ -164,7 +164,7 @@ export class IntegrationsController {
       return res.status(500);
     }
 
-    if (data) return data;
+    if (data) return res.json(data);
 
     return res.status(HttpStatus.NOT_FOUND).json({ message: error });
   }
@@ -189,7 +189,7 @@ export class IntegrationsController {
       // unhandled error
       return res.status(500);
     }
-    if (data) return data;
+    if (data) return res.json(data);
     return res.status(HttpStatus.NOT_FOUND).json({ message: error });
   }
 
@@ -213,6 +213,6 @@ export class IntegrationsController {
       // unhandled error
       return res.status(500);
     }
-    return data;
+    return res.json(data);
   }
 }

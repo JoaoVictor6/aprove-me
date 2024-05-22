@@ -149,7 +149,7 @@ describe('IntegrationsController /integrations', () => {
       });
 
       it('send a json with data and OK status code if is receive a valid id', async () => {
-        const { responseStub } = getResponseStub();
+        const { responseStub, responseJsonMethodStub } = getResponseStub();
         const payableMock = payableFactory();
 
         jest.spyOn(service, 'findPayable').mockImplementation(async () => ({
@@ -157,12 +157,12 @@ describe('IntegrationsController /integrations', () => {
           error: null,
         }));
 
-        const returnedValue = await controller.findUniquePayable(
+        await controller.findUniquePayable(
           { id: payableMock.id },
           responseStub,
         );
 
-        expect(returnedValue).toStrictEqual(payableMock);
+        expect(responseJsonMethodStub).toHaveBeenCalledWith(payableMock);
       });
 
       it('return internal error code for unhandled errors', async () => {
@@ -230,7 +230,7 @@ describe('IntegrationsController /integrations', () => {
       });
 
       it('send a json with data and OK status code if is receive a valid id', async () => {
-        const { responseStub } = getResponseStub();
+        const { responseStub, responseJsonMethodStub } = getResponseStub();
         const payableMock = payableFactory();
 
         jest.spyOn(service, 'deletePayable').mockImplementation(async () => ({
@@ -238,12 +238,12 @@ describe('IntegrationsController /integrations', () => {
           error: null,
         }));
 
-        const returnedValue = await controller.deleteUniquePayable(
+        await controller.deleteUniquePayable(
           { id: payableMock.id },
           responseStub,
         );
 
-        expect(returnedValue).toStrictEqual(payableMock);
+        expect(responseJsonMethodStub).toHaveBeenCalledWith(payableMock);
       });
 
       it('return internal error code for unhandled errors', async () => {
@@ -300,7 +300,7 @@ describe('IntegrationsController /integrations', () => {
       });
 
       it('send a json with data and OK status code if is receive a valid id', async () => {
-        const { responseStub } = getResponseStub();
+        const { responseStub, responseJsonMethodStub } = getResponseStub();
         const payableMock = payableFactory();
 
         jest.spyOn(service, 'updatePayable').mockImplementation(async () => ({
@@ -308,13 +308,13 @@ describe('IntegrationsController /integrations', () => {
           error: null,
         }));
 
-        const returnedValue = await controller.updateUniquePayable(
+        await controller.updateUniquePayable(
           { id: payableMock.id },
           payableMock,
           responseStub,
         );
 
-        expect(returnedValue).toStrictEqual(payableMock);
+        expect(responseJsonMethodStub).toHaveBeenCalledWith(payableMock);
       });
 
       it('return internal error code for unhandled errors', async () => {
@@ -380,7 +380,7 @@ describe('IntegrationsController /integrations', () => {
         );
       });
       it('return created payable object', async () => {
-        const { responseStub } = getResponseStub();
+        const { responseStub, responseJsonMethodStub } = getResponseStub();
         const payableMock = payableFactory();
         const expectedPropsPassedOnCreatePayable = {
           assignor: payableMock.assignor,
@@ -393,12 +393,12 @@ describe('IntegrationsController /integrations', () => {
           .mockImplementation(createPayableSpy);
         createPayableSpy.mockResolvedValue({ data: payableMock, error: null });
 
-        const returnedValue = await controller.createPayable(
+        await controller.createPayable(
           expectedPropsPassedOnCreatePayable,
           responseStub,
         );
 
-        expect(returnedValue).toStrictEqual(payableMock);
+        expect(responseJsonMethodStub).toHaveBeenCalledWith(payableMock);
       });
       it('return bad request status if assignor id not exists on database', async () => {
         const createPayableSpy = jest.fn();
@@ -471,7 +471,7 @@ describe('IntegrationsController /integrations', () => {
       });
 
       it('send a json with data and OK status code if is receive a valid id', async () => {
-        const { responseStub } = getResponseStub();
+        const { responseStub, responseJsonMethodStub } = getResponseStub();
         const assignorMock = assignorFactory();
 
         jest.spyOn(service, 'findAssignor').mockImplementation(async () => ({
@@ -479,12 +479,12 @@ describe('IntegrationsController /integrations', () => {
           error: null,
         }));
 
-        const returnedValue = await controller.findUniqueAssignor(
+        await controller.findUniqueAssignor(
           { id: assignorMock.id },
           responseStub,
         );
 
-        expect(returnedValue).toStrictEqual(assignorMock);
+        expect(responseJsonMethodStub).toHaveBeenCalledWith(assignorMock);
       });
 
       it('return internal error code for unhandled errors', async () => {
@@ -555,7 +555,7 @@ describe('IntegrationsController /integrations', () => {
       });
 
       it('send a json with data and OK status code if is receive a valid id', async () => {
-        const { responseStub } = getResponseStub();
+        const { responseStub, responseJsonMethodStub } = getResponseStub();
         const assignorMock = assignorFactory();
 
         jest.spyOn(service, 'deleteAssignor').mockImplementation(async () => ({
@@ -563,12 +563,12 @@ describe('IntegrationsController /integrations', () => {
           error: null,
         }));
 
-        const returnedValue = await controller.deleteUniqueAssignor(
+        await controller.deleteUniqueAssignor(
           { id: assignorMock.id },
           responseStub,
         );
 
-        expect(returnedValue).toStrictEqual(assignorMock);
+        expect(responseJsonMethodStub).toHaveBeenCalledWith(assignorMock);
       });
 
       it('return internal error code for unhandled errors', async () => {
@@ -625,7 +625,7 @@ describe('IntegrationsController /integrations', () => {
       });
 
       it('send a json with data and OK status code if is receive a valid id', async () => {
-        const { responseStub } = getResponseStub();
+        const { responseStub, responseJsonMethodStub } = getResponseStub();
         const assignorMock = assignorFactory();
 
         jest.spyOn(service, 'updateAssignor').mockImplementation(async () => ({
@@ -633,13 +633,13 @@ describe('IntegrationsController /integrations', () => {
           error: null,
         }));
 
-        const returnedValue = await controller.updateUniqueAssignor(
+        await controller.updateUniqueAssignor(
           { id: assignorMock.id },
           assignorMock,
           responseStub,
         );
 
-        expect(returnedValue).toStrictEqual(assignorMock);
+        expect(responseJsonMethodStub).toHaveBeenCalledWith(assignorMock);
       });
 
       it('return internal error code for unhandled errors', async () => {
@@ -703,7 +703,7 @@ describe('IntegrationsController /integrations', () => {
         );
       });
       it('return created assignor object', async () => {
-        const { responseStub } = getResponseStub();
+        const { responseStub, responseJsonMethodStub } = getResponseStub();
         const assignorMock = assignorFactory();
         const expectedAssignorObject: CreateAssignorDTO = {
           document: assignorMock.document,
@@ -720,12 +720,9 @@ describe('IntegrationsController /integrations', () => {
           error: null,
         });
 
-        const returnedValue = await controller.createAssignor(
-          expectedAssignorObject,
-          responseStub,
-        );
+        await controller.createAssignor(expectedAssignorObject, responseStub);
 
-        expect(returnedValue).toStrictEqual(assignorMock);
+        expect(responseJsonMethodStub).toHaveBeenCalledWith(assignorMock);
       });
       it('return bad request status if assignor id not exists on database', async () => {
         const createAssignorSpy = jest.fn();
