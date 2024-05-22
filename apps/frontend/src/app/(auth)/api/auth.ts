@@ -3,7 +3,7 @@
 import { apiClient } from "@/lib/apiClient"
 import { StatusCodes } from "http-status-codes"
 
-const assignorUrls = {
+const authUrls = {
   create: '/integrations/auth'
 }
 
@@ -16,7 +16,7 @@ export const auth = async ({ login, password }: { login: string, password: strin
   error: null,
   data: { token: string }
 }> => {
-  const { error, data } = await apiClient.post<{token: string}>(assignorUrls.create, { login, password })
+  const { error, data } = await apiClient.post<{token: string}>(authUrls.create, { login, password })
   if (error) {
     if(error.status === StatusCodes.UNAUTHORIZED) {
       return {
