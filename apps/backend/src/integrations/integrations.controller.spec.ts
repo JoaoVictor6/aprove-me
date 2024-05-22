@@ -7,7 +7,10 @@ import { Response } from 'express';
 import { CreateAssignorDTO } from './DTO/createAssignor.dto';
 import { IntegrationsController } from './integrations.controller';
 import { IntegrationsService } from './integrations.service';
-import { PRISMA_FOREIGN_KEY_CONSTRAINT_FAILED } from './prisma.constants';
+import {
+  PRISMA_FOREIGN_KEY_CONSTRAINT_FAILED,
+  PRISMA_UNIQUE_KEY_ERROR,
+} from './prisma.constants';
 import { assignorFactory } from './utils/test/assignorFactory';
 import { payableFactory } from './utils/test/payableFactory';
 const getResponseStub = () => {
@@ -160,7 +163,7 @@ describe('IntegrationsController /integrations', () => {
           data: payableMock,
           error: null,
         }));
-        console.log(responseStub);
+
         await controller.findUniquePayable(
           { id: payableMock.id },
           responseStub,
@@ -753,6 +756,61 @@ describe('IntegrationsController /integrations', () => {
 
         expect(responseStatusMethodStub).toHaveBeenCalledWith(
           HttpStatus.BAD_REQUEST,
+        );
+      });
+      it('return bad request status if conflict error on database', async () => {
+        const createAssignorSpy = jest.fn();
+        jest
+          .spyOn(service, 'createAssignor')
+          .mockImplementation(createAssignorSpy);
+        createAssignorSpy.mockResolvedValue({
+          data: null,
+          error: new Prisma.PrismaClientKnownRequestError(
+            'Unique constraint failed on the: assignor',
+            { code: PRISMA_UNIQUE_KEY_ERROR, clientVersion: '1' },
+          ),
+        });
+        const { responseStub, responseStatusMethodStub } = getResponseStub();
+        const assignorMock = assignorFactory();
+        const expectedAssignorObject: CreateAssignorDTO = {
+          document: assignorMock.document,
+          email: assignorMock.email,
+          name: assignorMock.name,
+          phone: assignorMock.phone,
+        };
+
+        await controller.createAssignor(expectedAssignorObject, responseStub);
+
+        expect(responseStatusMethodStub).toHaveBeenCalledWith(
+          HttpStatus.BAD_REQUEST,
+        );
+      });
+
+      it('return internal error status if occurs unhandled error on prisma', async () => {
+        const createAssignorSpy = jest.fn();
+        jest
+          .spyOn(service, 'createAssignor')
+          .mockImplementation(createAssignorSpy);
+        createAssignorSpy.mockResolvedValue({
+          data: null,
+          error: new Prisma.PrismaClientKnownRequestError(
+            'Unique constraint failed on the: assignor',
+            { code: 'random code', clientVersion: '1' },
+          ),
+        });
+        const { responseStub, responseStatusMethodStub } = getResponseStub();
+        const assignorMock = assignorFactory();
+        const expectedAssignorObject: CreateAssignorDTO = {
+          document: assignorMock.document,
+          email: assignorMock.email,
+          name: assignorMock.name,
+          phone: assignorMock.phone,
+        };
+
+        await controller.createAssignor(expectedAssignorObject, responseStub);
+
+        expect(responseStatusMethodStub).toHaveBeenCalledWith(
+          HttpStatus.INTERNAL_SERVER_ERROR,
         );
       });
     });

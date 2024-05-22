@@ -20,13 +20,34 @@ import { CreatePayableDTO } from './DTO/createPayable.dto';
 import { EditAssignorDTO } from './DTO/editAssignor.dto';
 import { EditPayableDTO } from './DTO/editPayable.DTO';
 import { IntegrationsService } from './integrations.service';
-import { PRISMA_FOREIGN_KEY_CONSTRAINT_FAILED } from './prisma.constants';
+import {
+  PRISMA_FOREIGN_KEY_CONSTRAINT_FAILED,
+  PRISMA_UNIQUE_KEY_ERROR,
+} from './prisma.constants';
 const verifyId = (id: string) => {
   const { success: isUUID } = z.string().uuid().safeParse(id);
 
   return { isUUID };
 };
 
+const prismaErrorHandler = (
+  error: Prisma.PrismaClientKnownRequestError,
+  res: Response,
+) => {
+  if (error.code === PRISMA_UNIQUE_KEY_ERROR) {
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ message: 'Assignor already exists' })
+      .end();
+  }
+  if (error.code === PRISMA_FOREIGN_KEY_CONSTRAINT_FAILED) {
+    return res
+      .status(HttpStatus.BAD_REQUEST)
+      .json({ message: 'Invalid assignor' })
+      .end();
+  }
+  return res.status(500).end();
+};
 @Controller('integrations')
 export class IntegrationsController {
   constructor(private readonly integrationsService: IntegrationsService) {}
@@ -56,7 +77,6 @@ export class IntegrationsController {
         .end();
     }
     const { data, error } = await this.integrationsService.findPayable(id);
-    console.log(res.status(1));
     if (error) {
       // unhandled error
       return res.status(500).end();
@@ -128,12 +148,7 @@ export class IntegrationsController {
 
     if (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === PRISMA_FOREIGN_KEY_CONSTRAINT_FAILED) {
-          return res
-            .status(HttpStatus.BAD_REQUEST)
-            .json({ message: 'Invalid assignor' })
-            .end();
-        }
+        return prismaErrorHandler(error, res);
       }
       // unhandled error
       return res.status(500).end();
@@ -219,15 +234,9 @@ export class IntegrationsController {
   ) {
     const { data, error } =
       await this.integrationsService.createAssignor(createAssignorDto);
-
     if (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === PRISMA_FOREIGN_KEY_CONSTRAINT_FAILED) {
-          return res
-            .status(HttpStatus.BAD_REQUEST)
-            .json({ message: 'Invalid assignor' })
-            .end();
-        }
+        return prismaErrorHandler(error, res);
       }
       // unhandled error
       return res.status(500).end();
