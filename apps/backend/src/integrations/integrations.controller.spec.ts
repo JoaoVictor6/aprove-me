@@ -12,13 +12,17 @@ import { assignorFactory } from './utils/test/assignorFactory';
 import { payableFactory } from './utils/test/payableFactory';
 const getResponseStub = () => {
   const responseStatusMethodStub = jest.fn();
+  const endFnStub = jest.fn();
   const responseJsonMethodStub = jest.fn();
   const responseStub: Partial<Response> = {
-    status: responseStatusMethodStub.mockReturnValue({
-      json: responseJsonMethodStub,
-    }),
+    status: responseStatusMethodStub,
     json: responseJsonMethodStub,
   };
+  responseJsonMethodStub.mockReturnValue({ end: endFnStub });
+  responseStatusMethodStub.mockReturnValue({
+    end: endFnStub,
+    json: responseJsonMethodStub,
+  });
 
   return {
     responseStub: responseStub as unknown as Response<
@@ -156,7 +160,7 @@ describe('IntegrationsController /integrations', () => {
           data: payableMock,
           error: null,
         }));
-
+        console.log(responseStub);
         await controller.findUniquePayable(
           { id: payableMock.id },
           responseStub,

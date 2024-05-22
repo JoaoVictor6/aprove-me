@@ -37,9 +37,10 @@ export class IntegrationsController {
     if (createCredentialsError) {
       return res
         .status(HttpStatus.UNAUTHORIZED)
-        .json({ message: 'Invalid credentials' });
+        .json({ message: 'Invalid credentials' })
+        .end();
     }
-    return res.status(HttpStatus.OK).json({ token: data.token });
+    return res.status(HttpStatus.OK).json({ token: data.token }).end();
   }
 
   @Get('payable/:id')
@@ -49,17 +50,21 @@ export class IntegrationsController {
   ): Promise<payable | Response> {
     const { isUUID } = verifyId(id);
     if (!isUUID) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid id' });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ message: 'Invalid id' })
+        .end();
     }
     const { data, error } = await this.integrationsService.findPayable(id);
+    console.log(res.status(1));
     if (error) {
       // unhandled error
-      return res.status(500);
+      return res.status(500).end();
     }
 
-    if (data) return res.json(data);
+    if (data) return res.json(data).end();
 
-    return res.status(HttpStatus.NOT_FOUND).json({ message: error });
+    return res.status(HttpStatus.NOT_FOUND).json({ message: error }).end();
   }
 
   @Delete('payable/:id')
@@ -69,17 +74,20 @@ export class IntegrationsController {
   ): Promise<payable | Response> {
     const { isUUID } = verifyId(id);
     if (!isUUID) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid id' });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ message: 'Invalid id' })
+        .end();
     }
     const { data, error } = await this.integrationsService.deletePayable(id);
     if (error) {
       // unhandled error
-      return res.status(500);
+      return res.status(500).end();
     }
 
-    if (data) return res.json(data);
+    if (data) return res.json(data).end();
 
-    return res.status(HttpStatus.NOT_FOUND).json({ message: error });
+    return res.status(HttpStatus.NOT_FOUND).json({ message: error }).end();
   }
 
   @Put('payable/:id')
@@ -91,7 +99,10 @@ export class IntegrationsController {
   ) {
     const { isUUID } = verifyId(id);
     if (!isUUID) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid id' });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ message: 'Invalid id' })
+        .end();
     }
 
     const { data, error } = await this.integrationsService.updatePayable(
@@ -100,10 +111,10 @@ export class IntegrationsController {
     );
     if (error) {
       // unhandled error
-      return res.status(500);
+      return res.status(500).end();
     }
-    if (data) return res.json(data);
-    return res.status(HttpStatus.NOT_FOUND).json({ message: error });
+    if (data) return res.json(data).end();
+    return res.status(HttpStatus.NOT_FOUND).json({ message: error }).end();
   }
 
   @Post('payable')
@@ -120,13 +131,14 @@ export class IntegrationsController {
         if (error.code === PRISMA_FOREIGN_KEY_CONSTRAINT_FAILED) {
           return res
             .status(HttpStatus.BAD_REQUEST)
-            .json({ message: 'Invalid assignor' });
+            .json({ message: 'Invalid assignor' })
+            .end();
         }
       }
       // unhandled error
-      return res.status(500);
+      return res.status(500).end();
     }
-    return res.json(data);
+    return res.json(data).end();
   }
 
   @Get('assignor/:id')
@@ -136,17 +148,20 @@ export class IntegrationsController {
   ): Promise<assignor | Response> {
     const { isUUID } = verifyId(id);
     if (!isUUID) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid id' });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ message: 'Invalid id' })
+        .end();
     }
     const { data, error } = await this.integrationsService.findAssignor(id);
     if (error) {
       // unhandled error
-      return res.status(500);
+      return res.status(500).end();
     }
 
-    if (data) return res.json(data);
+    if (data) return res.json(data).end();
 
-    return res.status(HttpStatus.NOT_FOUND).json({ message: error });
+    return res.status(HttpStatus.NOT_FOUND).json({ message: error }).end();
   }
 
   @Delete('assignor/:id')
@@ -161,12 +176,12 @@ export class IntegrationsController {
     const { data, error } = await this.integrationsService.deleteAssignor(id);
     if (error) {
       // unhandled error
-      return res.status(500);
+      return res.status(500).end();
     }
 
-    if (data) return res.json(data);
+    if (data) return res.json(data).end();
 
-    return res.status(HttpStatus.NOT_FOUND).json({ message: error });
+    return res.status(HttpStatus.NOT_FOUND).json({ message: error }).end();
   }
 
   @Put('assignor/:id')
@@ -178,7 +193,10 @@ export class IntegrationsController {
   ) {
     const { isUUID } = verifyId(id);
     if (!isUUID) {
-      return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid id' });
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ message: 'Invalid id' })
+        .end();
     }
 
     const { data, error } = await this.integrationsService.updateAssignor(
@@ -187,10 +205,10 @@ export class IntegrationsController {
     );
     if (error) {
       // unhandled error
-      return res.status(500);
+      return res.status(500).end();
     }
-    if (data) return res.json(data);
-    return res.status(HttpStatus.NOT_FOUND).json({ message: error });
+    if (data) return res.json(data).end();
+    return res.status(HttpStatus.NOT_FOUND).json({ message: error }).end();
   }
 
   @Post('assignor')
@@ -207,12 +225,13 @@ export class IntegrationsController {
         if (error.code === PRISMA_FOREIGN_KEY_CONSTRAINT_FAILED) {
           return res
             .status(HttpStatus.BAD_REQUEST)
-            .json({ message: 'Invalid assignor' });
+            .json({ message: 'Invalid assignor' })
+            .end();
         }
       }
       // unhandled error
-      return res.status(500);
+      return res.status(500).end();
     }
-    return res.json(data);
+    return res.json(data).end();
   }
 }
