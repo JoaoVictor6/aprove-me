@@ -24,7 +24,7 @@ model payable {
 
 model assignor {
   id String @unique @default(uuid())
-  document String
+  document String @unique
   email String
   phone String
   name String
