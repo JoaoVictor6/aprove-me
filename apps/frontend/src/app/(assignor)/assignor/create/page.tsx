@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { createAssignor } from '../../api/createAssignor';
-import { AssignorSchema } from '../../schema';
+import { AssignorSchema } from '../../assignor.schema';
 
 const assignorCreateSchema = AssignorSchema.omit({id: true})
 

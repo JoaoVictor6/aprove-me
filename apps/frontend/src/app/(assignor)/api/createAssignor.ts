@@ -2,7 +2,7 @@
 import { apiClient } from "@/lib/apiClient"
 import { useAuthStore } from "@/stores/auth"
 import { z } from "zod"
-import { AssignorSchema } from "../schema"
+import { AssignorSchema } from "../assignor.schema"
 
 const CREATE_ASSIGNOR_PATH = '/integrations/assignor'
 
