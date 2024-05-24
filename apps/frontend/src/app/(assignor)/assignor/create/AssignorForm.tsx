@@ -87,7 +87,7 @@ export function AssignorForm() {
           )}
         />
       ))}
-      <Button className="w-full" type="submit">
+      <Button disabled={form.formState.isSubmitting} className="w-full" type="submit">
         Submit
       </Button>
     </form>
