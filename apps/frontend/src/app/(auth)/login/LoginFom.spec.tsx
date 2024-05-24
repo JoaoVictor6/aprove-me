@@ -1,10 +1,10 @@
 import { Form } from "@/components/ui/form";
-import * as useToastFile from "@/components/ui/use-toast";
+import { nextNavigationSetup } from "@/lib/tests/nextNavigationSetup";
+import { toastSetup } from "@/lib/tests/toastSetup";
 import * as authStore from "@/stores/auth";
 import { faker } from "@faker-js/faker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import * as nextNavigationFile from "next/navigation";
 import { ReactNode } from "react";
 import { FormState, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -20,15 +20,6 @@ const authFunctionSetup = () => {
   const authFnSpy = vi.fn();
   vi.spyOn(authFile, "auth").mockImplementation(authFnSpy);
   return { authFnSpy };
-};
-const toastSetup = () => {
-  const toastSpy = vi.fn();
-  // @ts-expect-error return type error
-  vi.spyOn(useToastFile, "useToast").mockImplementation(() => ({
-    toast: toastSpy,
-  }));
-
-  return { toastSpy };
 };
 const authStoreSetup = () => {
   const setTokenSpy = vi.fn();
@@ -62,12 +53,6 @@ const LoginFormWrapper = (
       </Form>
     ) as ReactNode;
   };
-};
-const nextNavigationSetup = () => {
-  const useRouterSpy = vi.fn();
-  vi.spyOn(nextNavigationFile, "useRouter").mockImplementation(useRouterSpy);
-
-  return { useRouterSpy };
 };
 const fillAndSubmitLoginForm = () => {
   const password = screen.getByLabelText("Password");
