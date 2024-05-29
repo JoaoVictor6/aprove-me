@@ -1,11 +1,11 @@
 type HttpMethod = "POST" | "GET" | "PUT" | "DELETE";
 
-export const fetchFn = async <ResponseType>(
+export const fetchFn = async <ResponseType>({ method, url, body, header }: {
   method: HttpMethod,
   url: string,
   body?: unknown,
   header?: HeadersInit
-) => {
+}) => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL_BASE}${url}`,
     {

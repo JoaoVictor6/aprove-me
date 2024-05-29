@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Res,
   UsePipes,
   ValidationPipe,
@@ -50,7 +51,7 @@ const prismaErrorHandler = (
 };
 @Controller('integrations')
 export class IntegrationsController {
-  constructor(private readonly integrationsService: IntegrationsService) {}
+  constructor(private readonly integrationsService: IntegrationsService) { }
   @Post('auth')
   auth(@Body() authDTO: AuthDTO, @Res() res: Response) {
     const { error: createCredentialsError, data } =
@@ -242,5 +243,14 @@ export class IntegrationsController {
       return res.status(500).end();
     }
     return res.json(data).end();
+  }
+
+  @Get('assignor')
+  async viewAssignor(@Query("columns") columns: keyof assignor) {
+    const { error, data } = await this.integrationsService.getAssignors(...columns.split(",") as (keyof assignor)[]);
+    if (error) {
+      throw error
+    }
+    return data
   }
 }

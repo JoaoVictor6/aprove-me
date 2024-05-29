@@ -83,8 +83,11 @@ export function CreatePayableForm() {
             <FormLabel>Valor</FormLabel>
             <FormControl>
               <CurrencyInput
-                onChangeValue={() => undefined}
-                InputElement={<Input {...field} placeholder="Digite o valor aqui" />}
+                {...field}
+                onChangeValue={(_, originalValue) => {
+                  form.setValue('value', Number(originalValue))
+                }}
+                InputElement={<Input placeholder="Digite o valor aqui" />}
               />
             </FormControl>
             <FormMessage />

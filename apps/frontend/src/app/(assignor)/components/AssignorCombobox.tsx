@@ -16,11 +16,7 @@ import {
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { cache, use, useState } from "react"
-import { z } from "zod"
-import { AssignorSchema } from "../assignor.schema"
-
-const assignorListSchema = AssignorSchema.omit({ email: true, id: true, phone: true });
-type AssignorComboboxList = z.infer<typeof assignorListSchema>
+import { viewAssignor } from "../api/viewAssignors"
 
 const LoadAssignorFallback = () => (
   <Button className="flex gap-2 items-center w-full" variant={"secondary"} disabled>
@@ -45,8 +41,15 @@ const LoadAssignorFallback = () => (
 )
 
 const getAssignors = cache(async () => {
-  await new Promise(r => setTimeout(r, 1000))
-  return [] as AssignorComboboxList[]
+  const { data, error } = await viewAssignor("id", "name")
+  if (error) {
+    console.info(error)
+    throw new Error(error.message)
+  }
+  if (!data) {
+    throw new Error("Assignor lists is null")
+  }
+  return data
 })
 
 export function AssignorCombobox({ onChange }: { onChange?: (assignorId: string) => void }) {
@@ -64,7 +67,7 @@ export function AssignorCombobox({ onChange }: { onChange?: (assignorId: string)
           className="w-full justify-between"
         >
           {value
-            ? assignorList.find((assignor) => assignor.name === value)?.name
+            ? value
             : "Selecione um cedente"}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -76,10 +79,10 @@ export function AssignorCombobox({ onChange }: { onChange?: (assignorId: string)
           <CommandGroup>
             {assignorList.map((assignor) => (
               <CommandItem
-                key={assignor.document}
+                key={assignor.id}
                 value={assignor.name}
                 onSelect={(currentValue) => {
-                  onChange?.(currentValue)
+                  onChange?.(assignor.id)
                   setValue(currentValue === value ? "" : currentValue)
                   setOpen(false)
                 }}
@@ -87,7 +90,7 @@ export function AssignorCombobox({ onChange }: { onChange?: (assignorId: string)
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    value === assignor.document ? "opacity-100" : "opacity-0"
+                    value === assignor.id ? "opacity-100" : "opacity-0"
                   )}
                 />
                 {assignor.name}

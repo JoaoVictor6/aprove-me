@@ -19,6 +19,8 @@ interface IIntegrationsService {
 
   findAssignor: (id: string) => Promise<DefaultReturn<assignor>>;
 
+  getAssignors: <T extends (keyof assignor)[]>(...columns: T) => Promise<DefaultReturn<Pick<assignor, T[number]>[]>>
+
   deletePayable: (id: string) => Promise<DefaultReturn>;
 
   deleteAssignor: (id: string) => Promise<DefaultReturn<assignor>>;
@@ -45,7 +47,7 @@ export class IntegrationsService implements IIntegrationsService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
-  ) {}
+  ) { }
   createCredentials({
     password,
     login,
@@ -200,6 +202,22 @@ export class IntegrationsService implements IIntegrationsService {
         },
       });
       return { data, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  }
+
+  async getAssignors<T extends (keyof assignor)[]>(...columns: T): ReturnType<IIntegrationsService['getAssignors']> {
+    try {
+      const data = await this.prismaService.assignor.findMany({
+        select: {
+          id: columns.includes("id"),
+          name: columns.includes("name"),
+          email: columns.includes("email"),
+          phone: columns.includes("phone")
+        },
+      })
+      return { data, error: null } as unknown as { error: null; data: Pick<assignor, T[number]>[] }
     } catch (error) {
       return { data: null, error };
     }

@@ -8,9 +8,9 @@ export const apiClient = {
     body: unknown,
     header?: HeadersInit
   ) => {
-    return await fetchFn<ResponseType>("POST", url, body, header);
+    return await fetchFn<ResponseType>({ method: 'POST', url, body, header });
   },
   get: async <ResponseType>(url: string, header?: HeadersInit) => {
-    return await fetchFn<ResponseType>("GET", url, header);
+    return await fetchFn<ResponseType>({ method: "GET", url, header });
   },
 };
